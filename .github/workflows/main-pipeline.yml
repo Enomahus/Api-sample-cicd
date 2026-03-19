@@ -1,0 +1,44 @@
+name: CI-CD Pipeline .NET 10
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  # 1. Étape de Build & Test (CI)
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Run Tests
+        # Cette commande échouera si un test ne passe pas, stoppant le pipeline
+        run: dotnet test --no-build --configuration Release --verbosity normal
+
+  # 2. Étape de Déploiement (CD)
+  deploy:
+    needs: build-and-test
+    # On ne déploie QUE si on est sur la branche master et que le build a réussi
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy to Production
+        run: |
+          echo "🚀 Déploiement en cours vers ton serveur ou Azure/AWS..."
+          # Ici, tu ajouterais tes commandes spécifiques (ex: docker push, az webapp deploy, etc.)
