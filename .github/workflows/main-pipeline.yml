@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ develop ]
 
+env:
+  FORCE_JAVACRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   # 1. Étape de Build & Test (CI)
   build-and-test:
