@@ -5,9 +5,10 @@ on:
     branches: [ master, develop ]
   pull_request:
     branches: [ develop ]
+  #workflow_dispatch: #Permet de lancer le pipeline à la main pour tester
 
 env:
-  FORCE_JAVACRIPT_ACTIONS_TO_NODE24: true
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
 jobs:
   # 1. Étape de Build & Test (CI)
@@ -35,7 +36,8 @@ jobs:
   deploy:
     needs: build-and-test
     # On ne déploie QUE si on est sur la branche master et que le build a réussi
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # Autorise le déploiement sur master ET develop (tester le job de deploy)
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref =='refs/heads/develop')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
